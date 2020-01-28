@@ -10,58 +10,80 @@ import Foundation
 
 struct CalculatorBrain {
     
-    private var displayValue : String = "0"
+    private var number : Double = 0.0
     
-    private var calculatorValue : Double? {
+    private var currentOperation : String?
+    
+    private var result : Double?
+    
+    private mutating func performCalculation(){
         
-        get{
-            guard let number = Double(displayValue) else {
-                fatalError("Cannot convert display label text to a Double")
+        if currentOperation == "+/-" {
+            //calculatorValue *= -1
+        }
+        else if currentOperation == "%" {
+            //calculatorValue /= 100.0
+        }
+        else if currentOperation == "+" {
+            if let currentResult = result {
+                result = currentResult + number
             }
-            return number
         }
-        set{
-            displayValue = String(newValue)
+        else if currentOperation == "-" {
+            if let currentResult = result {
+                result = currentResult - number
+            }
         }
-        
+        else if currentOperation == "/" {
+            if let currentResult = result {
+                result = currentResult / number
+            }
+        }
+        else if currentOperation == "*" {
+            if let currentResult = result {
+                result = currentResult * number
+            }
+        }
     }
     
-    private var isCalcButtonPressed : Bool = false
-    
-    private var isDecimalButtonPressed : Bool = false
-    
-    mutating func calculationButton(operation : String) {
+    mutating func setNumberAndOperation(_ number : Double, operation : String){
         
-        isCalcButtonPressed = true
-        isDecimalButtonPressed = false
+        print("number \(self.number)")
+        print("currentOperation \(currentOperation)")
+        print("result \(result)")
         
-        if operation == "+/-" {
-            calculatorValue *= -1
-        }
-        else if operation == "%" {
-            calculatorValue /= 100.0
-        }
-        else if operation == "AC" {
-            calculatorValue = 0
-        }
-    }
-    
-    mutating func numberButton(btnTitle : String){
-        
-        if !isCalcButtonPressed {
-            //Esse if e pra evitar que varios pontos de decimal sejam inseridos no display
-            if !(btnTitle == "." && isDecimalButtonPressed){
-                displayValue = displayValue == "0" ? btnTitle : "\(displayValue)\(btnTitle)"
+        if operation != "AC" && operation != "=" {
+            self.number = number
+            
+            if let currentResult = result {
+                performCalculation()
+                currentOperation = operation
+            }else{
+                //what should happen if the result is nil?
+                currentOperation = operation
+                result = number
             }
-            isDecimalButtonPressed = btnTitle == "." ? true : isDecimalButtonPressed
+        }else if operation == "AC"{
+            result = nil
+            currentOperation = nil
+            self.number = 0.0
         }else{
-            displayValue = btnTitle
-            isCalcButtonPressed = false
+            //performCalculation()
+            currentOperation = nil
+            self.number = result ?? 0.0
         }
         
+        print("number \(self.number)")
+        print("currentOperation \(currentOperation)")
+        print("result \(result)")
     }
     
-    func getDisplayValue() -> String {
-        return displayValue
+    func getResult() -> String {
+        if let currentResult = result {
+            return String(currentResult)
+        }
+        else {
+            return "0"
+        }
     }
 }
